@@ -5,6 +5,7 @@ import React from 'react'
 import MeuPonto from './MeuPonto'
 import geoapifyClient from '../utils/geoapifyClient'
 import { Button } from '@primereact/ui/button'
+import Busca from './Busca'
 
 
 class App extends React.Component {
@@ -16,7 +17,6 @@ class App extends React.Component {
     }
 
     componentDidMount() {
-        console.log('componentDidMount')
         this.obterLocalizacao()
     }
     obterAno = () => {
@@ -24,7 +24,6 @@ class App extends React.Component {
     }
 
     render() {
-        console.log('render')
         const estiloSubtitulo = {
             fontSize: '20px',
             color: 'gray'
@@ -44,6 +43,7 @@ class App extends React.Component {
                     Descubra o que existe perto de você
                 </p>
                 <Creditos />
+
                 <div className="col-12 col-md-8">
                     {
                         (!this.state.latitude && !this.state.mensagemDeErro) ?
@@ -58,7 +58,10 @@ class App extends React.Component {
                                     <MeuPonto horarioLocalizacao={this.state.horarioLocalizacao} latitude={this.state.latitude} longitude={this.state.longitude} onAtualizar={this.obterLocalizacao}/>
                                 </Cartao>  
                     }
-                    <Button onClick={()=>this.onBuscaRealizada('catering.cafe', 1000)}>Testar</Button>
+                    <Cartao cabecalho="O que você procura?">
+                        <Busca onBuscaRealizada={this.onBuscaRealizada}></Busca>
+                    </Cartao>
+                    
                 </div>
                 <footer>
                     RolêRadar © {this.obterAno()}
@@ -67,7 +70,7 @@ class App extends React.Component {
         )
     }
     onBuscaRealizada = async (categoria, raio) => {
-        
+    
         const result = await geoapifyClient.get('/places', {
             params: {
                 categories: categoria,

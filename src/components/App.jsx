@@ -1,41 +1,84 @@
 import Cartao from './Cartao'
 import Creditos from './Creditos'
+import Loading from './Loading'
+import React from 'react'
 
-const App = () => {
-    const estiloSubtitulo = {
-        fontSize: '20px',
-        color: 'gray',  
+class App extends React.Component {
+    state = {
+        latitude: null,
+        longitude: null,
+        horarioLocalizacao: null,
+        mensagemDeErro: null
     }
-    const obterAno = () => {
-      
+
+    componentDidMount() {
+        console.log('componentDidMount')
+        this.obterLocalizacao()
+    }
+    obterAno = () => {
         return new Date().getFullYear()
     }
-    return (
-    <div>
-        <div>
-            <div className='flex align-items-center'>
-                <i className='pi pi-map-marker mr-2'/>
-                <h1 className="titulo">
-                    RolêRadar
-                </h1>
+
+    render() {
+        console.log('render')
+        const estiloSubtitulo = {
+            fontSize: '20px',
+            color: 'gray'
+        }
+        return (
+
+            <div>
+                <div>
+                    <div className='flex align-items-center'>
+                        <i className='pi pi-map-marker mr-2' />
+                        <h1 className="titulo">
+                            RolêRadar
+                        </h1>
+                    </div>
+                </div>
+                <p style={estiloSubtitulo}>
+                    Descubra o que existe perto de você
+                </p>
+                <Creditos />
+                <div className="col-12 col-md-8">
+                    {
+                        (!this.state.latitude && !this.state.mensagemDeErro) ?
+                            <Loading mensagem="Aguardando permissão de localização..."/>
+                            :
+                            this.state.mensagemDeErro ?
+                                <p>
+                                   {this.state.mensagemDeErro} 
+                                </p>
+                                :
+                                <p>
+                                    Localização obtida: {this.state.latitude}, {this.state.longitude}.
+                                </p> 
+                    }
+                </div>
+                <footer>
+                    RolêRadar © {this.obterAno()}
+                </footer>
             </div>
-        </div> 
-        <p style={estiloSubtitulo}>
+        )
+    }
 
-            Descubra o que existe perto de você
-        
-        </p>
-        <Creditos />
-        <Cartao cabecalho="Teste">
-            <p>Conteúdo do cartão</p>
-        </Cartao>
-    
-        <footer>
-            RolêRadar © {obterAno()}
-        </footer>
-    </div>
-  )
-    
+    obterLocalizacao = () => {
+        window.navigator.geolocation.getCurrentPosition(
+            (position) => {
+                this.setState({
+                    horarioLocalizacao: Date.now(),
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    mensagemDeErro: null
+                })
+            },
+            (erro) => {
+                console.log(`Erro: ${erro}`)
+                this.setState({
+                    mensagemDeErro: 'Não foi possível obter sua localização. Libere o acesso no navegador e atualize a página.'
+                })
+            }
+        )
+    }
 }
-
-export default App
+export default App 
